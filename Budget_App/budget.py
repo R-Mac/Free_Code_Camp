@@ -23,6 +23,22 @@ class Category:
     else:
       return True
 
+  def amount_spent(self) -> float:
+    #displays the total value of all withdraws (entries with values < 0) 
+    balance = 0.0
+    for entry in self.ledger:
+      if entry["amount"] < 0.0:
+        balance += entry["amount"]
+    return balance
+
+  def amount_earned(self) -> float:
+    #displays the total value of all deposits (entries with values > 0) 
+    balance = 0.0
+    for entry in self.ledger:
+      if entry["amount"] > 0.0:
+        balance += entry["amount"]
+    return balance
+
 
   def withdraw(self,amount:float,description:str="") -> bool:
     if self.get_balance() > amount:
@@ -53,7 +69,7 @@ class Category:
       printout +=  ("{:7.2f}".format(item['amount'])).rjust(7) + '\n'
 
     printout += "Total:" + "{:7.2f}".format(self.get_balance())
-    print(printout)    
+    #print(printout)    
     return printout
     #When the budget object is printed it should display:
 
@@ -70,4 +86,52 @@ class Category:
     #Total: 923.96
 
 def create_spend_chart(categories:list):
-  return True
+  percent_list = []
+  print_string = "Percentage spent by category\n"
+  total_spent = 0
+  if len(categories) > 4:
+    print("Can only process 4 categories")
+
+  for category in categories:
+    total_spent += abs(category.amount_spent())
+
+  for category in categories:
+    percent_list.append(({"Percent":(int((abs(category.amount_spent())/total_spent)*100)),"Category": category.category}))
+
+
+  for row in range(100,-10,-10):
+    print_string += str(row).rjust(3) + "| " #adding percentage to the row
+    for category_index in percent_list:
+        #print(category_index["Percent"])
+        if category_index["Percent"] >= row:
+          print_string += "o  "
+        else:
+          print_string += "   "
+    print_string += "\n"    
+  #print(percent_list)
+  print_string += ("    " + "---" * len(percent_list)) + "-\n"
+  longest_string = 0
+  for category_name in percent_list:
+    if len(category_name['Category']) > longest_string:
+        longest_string = len(category_name['Category'])
+  
+  for string_index in range(0,longest_string):
+    print_string += "    "
+    for category_name_vert in percent_list:
+      print_string += " "
+      try:
+        print_string += category_name_vert['Category'][string_index]
+      except:
+        print_string += " "
+      print_string += " "
+    if string_index < longest_string-1:
+      print_string += " \n"
+    else:
+      print_string += " "
+    
+  #print(repr(print_string))
+
+  
+
+
+  
